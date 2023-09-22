@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIF.js Image Processing</title>
+
+    <!-- 引入 GIF.js 库 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/gif.js/0.2.0/gif.worker.js"></script>
+</head>
+<body>
+    <h1>GIF.js Image Processing</h1>
+
+    <!-- 上传图片的表单 -->
+    <input type="file" id="image-upload" accept="image/*">
+    <button id="process-button">Process and Create GIF</button>
+
+    <h2>Processed GIF:</h2>
+
+    <!-- 显示处理后的 GIF 动画 -->
+    <img id="processed-gif" alt="Processed GIF">
+
+    <script>
+        // 获取对相关元素的引用
+        var imageUploadInput = document.getElementById('image-upload');
+        var processButton = document.getElementById('process-button');
+        var processedGif = document.getElementById('processed-gif');
+
+        // 处理上传的图片并创建 GIF
+        function processImageAndCreateGIF() {
+            var file = imageUploadInput.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    // 创建一个新的 Image 对象
+                    var img = new Image();
+                    img.onload = function() {
+                         // 在这里进行图片处理，例如调整大小或添加滤镜
+
+                         // 创建一个 GIF 实例
+                         var gif = new GIF({
+                              workers: 2,
+                              quality: 10,
+                              width: img.width,
+                              height: img.height
+                         });
+
+                         // 向 GIF 动画中添加处理后的图像帧
+                         gif.addFrame(img, { delay: 200 });
+                         gif.setOptions({
+                              dither: FloydSteinberg-serpentine
+                         });
+                         // 渲染 GIF 动画
+                         gif.on('finished', function(blob) {
+                              // 将生成的 GIF 添加到 img 元素的 src 属性中
+                              processedGif.src = URL.createObjectURL(blob);
+                         });
+
+                         // 开始渲染动画
+                         gif.render();
+                    };
+                    img.src = e.target.result; 
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 监听处理按钮的点击事件
+        processButton.addEventListener('click', processImageAndCreateGIF);
+    </script>
+</body>
+</html>
